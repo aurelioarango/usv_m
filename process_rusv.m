@@ -5,52 +5,56 @@
 %cd Lab\\Aurelio_Thesis_Folder\\305
 %pwd
 
-% Zoom into images, create 64x64 image, from 20khz to 84khz 
-% from the original images 
+% Zoom into images, create 64x64 image, from 20khz to 84khz
+% from the original images
 % decrease the range to capture 22khz calls and test with real data
-% GIT hub git
+% Add it to GiHhub account
 % https://www.gnu.org/software/octave/
- 
 
+% Check for number of arguments
+function process_rusv(varargin)
+%celldisp(varargin);
+    % Check if the correct number of inputs is correct
+    if(nargin ~= 1)
+        fprintf("Usage process <Path To Wave files>\n");
+        return;
+    else
+        main(varargin);
+    end
+end
+% Main Program 
+function main(varargin)
 
-%Create file name
+curr_dir = pwd;
+%addpath(curr_dir);
+%cd varargin(1);
+path_wave_dir = varargin{1}{1};
 
-function filespath = get_files()
- %where the files are located
-	dir_path = 'C:\\Users\\Aurelio\\Documents\\MATLAB\\mupet\\305\\';
-  %grab file in directory
-	files = dir;
-	files([1,2],:) =[];
-	wavefiles = cell(10,1);
-  % creating wave filepaths
-	for i=1:numel(files)
-	  wavefiles(i) = strcat(dir_path,files(i).name);
-	endfor
-	filespath = wavefiles;
-endfunction
+%fprintf('%s\n',path_wave_dir);
+%move to wave directory
+%cd (path_wave_dir);
+%grab all the files inside the directory
+wave_files = dir (path_wave_dir);
+%wave_files = wave_files(~cellfun('isempty',(regexp(wave_files.name,'\.wav'))))
+wave_files = wave_files(~ismember({wave_files.name},{'.','..'}));
+wave_files.name
 
-%----------------------------------
-%main function
-%----------------------------------
-function process()
-%#not a function file:
-%1;
-clear all;
+%cd(curr_dir)
+%wave_files.name
 
-wavefiles = get_files();
-%wavefiles(1);
+%for i=1:numel(wave_files)
+%
+%fullfile(path_wave_dir, wave_files(i).name)
+%end
 
-endfunction
+%fullfile(dir (path_wave_dir,dir(path_wave_dir))
 
+%dir (path_wave_dir, '*.wav')
 
-%wavefiles_path = fullfile(dir_path,file_names.name);
+%wavefiles =  fullfile(dir (path_wave_dir, '*.wav'));
+%wavefiles
 
-%wavefiles_path
-%wavefiles = fullfile (file_path ,dir);
-%wavefiles;
-%wavefiles.name;
-
-%wavefiles.name;
+%fprintf('%s',wavefiles(1).name);
 
 %ask for path to dir
 %dir_path = char('305\\');
@@ -67,7 +71,7 @@ endfunction
 %wavefiles_2 = dir **/*.WAV
 %fprinf(wavefile_1)
 % show_syllables
-
+end
 function compute_usv(usvdir,usv_audio_file_name)
  % FFT
  Nfft=512;
