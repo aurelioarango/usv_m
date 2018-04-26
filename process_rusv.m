@@ -48,11 +48,11 @@ handles.flist = handles.flist.';
 %handles.wave_file_names = {};
 %handles.wave_file_names = wave_files.name
 
-process_all_files(handles);
+%process_all_files(handles);
 %create loop to traverse files
 process_file(handles,1);
 
-handles.syllable_data
+handles
 %show_syllables(handles);
 %{
 %process each file for usv extraction
@@ -96,6 +96,7 @@ function handles=mupet_initialize()
     handles.repertoire_learning_min_nb_syllables_fac=1;
     handles.repertoire_unit_size_seconds=200; % 76.8 for 64k window
     handles.patch_window=handles.repertoire_unit_size_seconds/handles.frame_shift_ms*1e-3; % ms divided by frameshift
+    
 
     % config file
     handles.configdefault{1}=5; % noise_reduction_sigma_default
@@ -136,7 +137,8 @@ function handles=load_wavfiles(handles, path)
            mkdir(handles.audiodir);
         end
     else
-        content=sprintf('No wave files found in directory\n');
+        sprintf('No wave files found in directory\n');
+        %content=sprintf('No wave files found in directory\n');
     end
 
 end
@@ -1201,18 +1203,26 @@ function show_syllables(handles,syllable_ndx)
     syllable_patch_fft = syllable_fft_median*ones(size(syllable_fft,1), syllable_patch_window);
     syllable_duration=size(syllable_fft,2);
     syllable_patch_fft(:, syllable_patch_window_start+1:syllable_patch_window_start+syllable_duration) = syllable_fft;
-
-
+    %syllable_duration
+    %syllable_patch_window_start;
+    %syllable_fft_median
+    
     %fprintf("processing Images \n ");
     % fft figure
     %axes(handles.syllable_axes_fft);
     syllable_patch_fft_dB=10*log10(abs(syllable_patch_fft(1:2:end,:)+1e-5)); % in dB
+    %syllable_patch_fft
     fft_range_db1=-30;
     fft_range_db1_min=-30;
     fft_range_db2=0;
     fft_peak_db=handles.syllable_stats{12,syllable_ndx};
     fft_range=[fft_range_db1_min , fft_peak_db+fft_range_db2];
-    imagesc(syllable_patch_fft_dB,fft_range); axis xy; colorbar;
+    %fft_peak_db
+    %syllable_patch_fft_dB; % image 
+    %fft_range
+    imagesc(syllable_patch_fft_dB,fft_range); 
+    axis xy; 
+    colorbar;
 
     %whos syllable_patch_fft
     %whos fft_range
@@ -1226,11 +1236,10 @@ function show_syllables(handles,syllable_ndx)
 
      %----------writing syllable to png file ------------%
 
-    [pathstr, name, ext] = fileparts(handles.filename)
+    [pathstr, name, ext] = fileparts(handles.filename);
     img_filename = sprintf('%s_%d.png',name, syllable_ndx);
 
-    img = getframe(gca);
-    imwrite(img.cdata, img_filename);
+    
     %hard code path
     %true_path_name = '\\\\Client\\C$\\Users\\Aurelio\\Documents\\MATLAB\\mupet\\images\';
     %path_name = pwd;
@@ -1243,29 +1252,37 @@ function show_syllables(handles,syllable_ndx)
 
     %-----------end of writing image to file ------------%
 
+    size(syllable_patch_fft_dB,1)/5:size(syllable_patch_fft_dB,1)
     set(gca,'YTick',[0:size(syllable_patch_fft_dB,1)/5:size(syllable_patch_fft_dB,1)]) % FFT bands
     set(gca,'YTickLabel',fix([0:handles.sample_frequency/2/5:handles.sample_frequency/2]/1e3)) % FFT bands
-    set(gca,'XTick',[0:syllable_patch_window/6:syllable_patch_window]) % frequency
-    set(gca, 'XTickLabel', fix([64]))
+    %set(gca,'XTick',[0:syllable_patch_window/6:syllable_patch_window]) % frequency
+    %set(gca, 'XTickLabel', fix([64]));
     %set(gca,'XTickLabel',fix([0:handles.frame_shift_ms*syllable_patch_window/6:syllable_patch_window*handles.frame_shift_ms]*1e3)) % frequency
-    %set(gca, 'FontSize',handles.FontSize3,'FontName','default');
-    %xlabel('Time (milliseconds)','FontSize',handles.FontSize2,'FontName','default');
-    %ylabel('Frequency [kHz]','FontSize',handles.FontSize2,'FontName','default');
-    title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
-    %ylim([size(syllable_fft,1)/125000*25000/2 size(syllable_fft,1)/2]);
-    ylim([size(syllable_fft,1)/100000*30000/2 size(syllable_fft,1)/2]);
-
-
-    xlabel('Time (milliseconds)','FontSize',11,'FontName','default');
-    ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
-    title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
+    set(gca, 'FontSize',11,'FontName','default');
+    %xlabel('Time (milliseconds)','FontSize',11,'FontName','default');
+    %ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
+    %title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
+    %ylim([size(syllable_fft,1)/125000*25000/2 size(syllable_fft,1)/2])
+    %ylim([size(syllable_fft,1)/100000*30000/2 size(syllable_fft,1)/2]);
+    ylim([0 250]);
+    xlim([syllable_patch_window_start-5 syllable_patch_window_start+59]);%size of 64 x-axis length
+    
+    img = getframe(gca);
+    [usv map_usv] = frame2im(img);
+    %img_size = size(img.cdata)
+    usv = imresize(usv,[64 64]);
+    imwrite(usv, img_filename);
+    
+    %xlabel('Time (milliseconds)','FontSize',11,'FontName','default');
+    %ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
+    %title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
 
 
     %imwrite(save_image.cdata,img_filename);
     %whos img
 
 
-    axvals=axis; %text(axvals(2)/2,axvals(4)/2,{'MUPET version 1.0', '(unreleased)'},'Color',[0.9 0.9 0.9],'FontSize',handles.FontSize1+10,'HorizontalAlignment','center','Rotation',45);
+    %axvals=axis; %text(axvals(2)/2,axvals(4)/2,{'MUPET version 1.0', '(unreleased)'},'Color',[0.9 0.9 0.9],'FontSize',handles.FontSize1+10,'HorizontalAlignment','center','Rotation',45);
 
     % gt figure
     %{
