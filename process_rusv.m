@@ -45,7 +45,7 @@ wave_files = wave_files(~ismember({wave_files.name},{'.','..'}));
 handles=mupet_initialize();
 handles = load_wavfiles(handles, path_wave_dir);
 handles.flist = handles.flist.';
-sy = image_dir;
+handles.image_dir = image_dir;
 
 %handles.wave_file_names = {};
 %handles.wave_file_names = wave_files.name
@@ -55,13 +55,13 @@ sy = image_dir;
 
 %check if dir exist otherwise make one
 %%{
-dir_status = exist ('images')
-if ~ dir_status 
-    fprintf('Creating images directory');
+%dir_status = exist ('images')
+%if ~ exist('images', 'dir') 
+%    fprintf('Creating images directory');
     mkdir ('images');
-else
-    fprintf('Exists \n');
-end
+%else
+%    fprintf('Exists \n');
+%end
 
 %%}
 
@@ -1279,35 +1279,33 @@ function show_syllables(handles,syllable_ndx)
     %xlabel('Time (milliseconds)','FontSize',11,'FontName','default');
     %ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
     %title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
-    %ylim([size(syllable_fft,1)/125000*25000/2 size(syllable_fft,1)/2])
-    ylim([size(syllable_fft,1)/100000*30000/2 size(syllable_fft,1)/2]);
+    ylim([size(syllable_fft,1)/125000*25000/2 size(syllable_fft,1)/2]);
+    %ylim([size(syllable_fft,1)/100000*30000/2 size(syllable_fft,1)/2]);
     %ylim([0 250]);
     
     syll_window = 0;
     
-    if syllable_duration /64  < 0
+    if syllable_duration  < 64
         syll_window = 64 - 5;
-    elseif syllable_duration / 128 < 0
+    elseif syllable_duration < 128 && syllable_duration > 64 
         syll_window = 128 - 5;
-    elseif syllable_duration /256 < 0
+    elseif syllable_duration < 256 && syllable_duration > 128
         syll_window = 256 - 5;
-    else
+    elseif syllable_duration < 512 && syllable_duration > 256
         syll_window = 512 - 5;
             
     end
+    %syll_window
     
     xlim([syllable_patch_window_start-5 syllable_patch_window_start+syll_window]);%size of 64 x-axis length
-    
-
-    
-    
-    
     
     img = getframe(gca);
     [usv map_usv] = frame2im(img);
     %img_size = size(img.cdata)
     usv = imresize(usv,[256 256]);
-    imwrite(usv,handles.image_dir ,img_filename);
+    %handles
+    filename = fullfile(handles.image_dir,img_filename );
+    imwrite(usv,filename,'png');
   
 end
 
