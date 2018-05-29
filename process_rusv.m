@@ -56,12 +56,12 @@ handles.image_dir = image_dir;
 %check if dir exist otherwise make one
 %%{
 %dir_status = exist ('images')
-%if ~ exist('images', 'dir') 
-%    fprintf('Creating images directory');
+if ~ exist('images', 'dir') 
+    fprintf('Creating images directory');
     mkdir ('images');
-%else
-%    fprintf('Exists \n');
-%end
+else
+    fprintf('Exists \n');
+end
 
 %%}
 
@@ -72,7 +72,7 @@ handles.image_dir = image_dir;
 
 %MAIN LOOP
 %%{
-
+images_dir = handles.image_dir;
 for j=1:2%numel(wave_files)
     %process all files 
     handles=process_file(handles,j);
@@ -80,6 +80,19 @@ for j=1:2%numel(wave_files)
     [rows, elements]=size(handles.syllable_data);
     handles.num_elements = elements;
     %process each syllable
+    %pos = strfind(handles.filename,'.WAV');
+    %handles.filename
+    sub_dir = extractBefore(handles.filename,'.WAV');
+   
+    %if ~ exist('images', 'dir') 
+    %    fprintf('Creating images directory');
+    %    mkdir ('images');
+    %else
+    %    fprintf('Exists \n');
+    %end
+    mkdir('images', sub_dir);
+    handles.image_dir = fullfile(images_dir, sub_dir);
+    
     for i=1:(handles.num_elements)
         show_syllables(handles,i);
     end
