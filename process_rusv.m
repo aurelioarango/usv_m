@@ -27,13 +27,10 @@ function main(varargin)
 
 curr_dir = pwd;
 image_dir = fullfile(curr_dir, 'images')
-%addpath(curr_dir);
+
 %cd varargin(1);
 path_wave_dir = varargin{1}{1};
 
-%fprintf('%s\n',path_wave_dir);
-%move to wave directory
-%cd (path_wave_dir);
 %grab all the files inside the directory
 wave_files = dir (path_wave_dir);
 %wave_files = wave_files(~cellfun('isempty',(regexp(wave_files.name,'\.wav'))))
@@ -47,10 +44,7 @@ handles = load_wavfiles(handles, path_wave_dir);
 handles.flist = handles.flist.';
 handles.image_dir = image_dir;
 
-%handles.wave_file_names = {};
-%handles.wave_file_names = wave_files.name
 
-%process_all_files(handles);
 %create loop to traverse files
 
 %check if dir exist otherwise make one
@@ -65,31 +59,19 @@ end
 
 %%}
 
-%TEST
-
-%handles = process_file(handles,1);
-%show_syllables(handles,1);
-
 %MAIN LOOP
 %%{
 images_dir = handles.image_dir;
-for j=1:2%numel(wave_files)
+for j=1:numel(wave_files)
     %process all files 
     handles=process_file(handles,j);
     %handles
     [rows, elements]=size(handles.syllable_data);
     handles.num_elements = elements;
     %process each syllable
-    %pos = strfind(handles.filename,'.WAV');
-    %handles.filename
+
     sub_dir = extractBefore(handles.filename,'.WAV');
-   
-    %if ~ exist('images', 'dir') 
-    %    fprintf('Creating images directory');
-    %    mkdir ('images');
-    %else
-    %    fprintf('Exists \n');
-    %end
+
     mkdir('images', sub_dir);
     handles.image_dir = fullfile(images_dir, sub_dir);
     
@@ -146,10 +128,10 @@ function handles=mupet_initialize()
     
 
     % config file
-    handles.configdefault{1}=5; % noise_reduction_sigma_default
+    handles.configdefault{1}=0; % noise_reduction_sigma_default
     handles.configdefault{2}=8; % min_syllable_duration_default
     handles.configdefault{3}=handles.repertoire_unit_size_seconds; % max_syllable_duration_default
-    handles.configdefault{4}=-15; % min_syllable_total_energy_default
+    handles.configdefault{4}=-65; % min_syllable_total_energy_default
     handles.configdefault{5}=-25; % min_syllable_peak_amplitude_default
     handles.configdefault{6}=5; % min_syllable_distance_default
     handles.configfile=fullfile(pwd,'config.csv');
@@ -424,7 +406,8 @@ function [syllable_data, syllable_stats, filestats, fs] = compute_musv(datadir,f
 
     % Gammatone filterbank
     NbChannels=64;
-    fsMin=90000;
+    %fsMin=90000;
+    fsMin=18000;
     fs=250000;
     frame_shift=floor(handles.frame_shift_ms*fs);
     frame_win=floor(handles.frame_win_ms*fs);
@@ -548,7 +531,8 @@ smooth_fac_low=10;
 grow_fac=floor(3*(0.0016/handles.frame_shift_ms));
 
 % frequency
-fsMin=90000;
+%fsMin=90000;
+fsMin=18000;
 fs=250000;
 frame_shift=floor(handles.frame_shift_ms*fs);
 frame_win=floor(handles.frame_win_ms*fs);
@@ -569,9 +553,9 @@ end
 
 % compute MUSV features
 %fmin=35000;
-fmin=30000
-%fmax=110000;
-fmax=90000
+fmin=18000;
+fmax=110000;
+%fmax=90000;
 Nmin=floor(Nfft/(fs/2)*fmin);
 Nmax=floor(Nfft/(fs/2)*fmax);
 [gt_sonogram, sonogram, E_low, E_usv, T]=FE_GT_spectra(audio_segment, fs, frame_win, frame_shift, Nfft, Nmin, Nmax);
@@ -713,7 +697,7 @@ function [lp,Xf,E_low, E_usv,T]=FE_GT_spectra(sam,fs,FrameLen,FrameShift,Nfft,Nm
     % T=length(sam);
 
     % Low pass removal
-    fmin=25000;
+    fmin=18000;
     fmax=0.99*fs/2;
     [b,a] = cheby1(8,  0.5, [fmin fmax]/(fs/2));
     sam=filter(b, a, [0 reshape(sam,1,length(sam))]);
@@ -1250,13 +1234,13 @@ function show_syllables(handles,syllable_ndx)
     %syllable_duration
     %syllable_patch_window_start;
     %syllable_fft_median
-    
+    %_le
     %fprintf("processing Images \n ");
     % fft figure
     %axes(handles.syllable_axes_fft);
     syllable_patch_fft_dB=10*log10(abs(syllable_patch_fft(1:2:end,:)+1e-5)); % in dB
     %syllable_patch_fft
-    fft_range_db1=-30;
+    fft_range_db1=-60;
     fft_range_db1_min=-30;
     fft_range_db2=0;
     fft_peak_db=handles.syllable_stats{12,syllable_ndx};
@@ -1264,6 +1248,7 @@ function show_syllables(handles,syllable_ndx)
     %fft_peak_db
     %syllable_patch_fft_dB; % image 
     %fft_range
+    
     imagesc(syllable_patch_fft_dB,fft_range); 
     axis xy; 
     colorbar;
@@ -1290,13 +1275,14 @@ function show_syllables(handles,syllable_ndx)
     %set(gca,'XTickLabel',fix([0:handles.frame_shift_ms*syllable_patch_window/6:syllable_patch_window*handles.frame_shift_ms]*1e3)) % frequency
     set(gca, 'FontSize',11,'FontName','default');
     %xlabel('Time (milliseconds)','FontSize',11,'FontName','default');
-    %ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
+    ylabel('Frequency [kHz]','FontSize',11,'FontName','default');
     %title('Sonogram','FontSize',11,'FontName','default','FontWeight','bold');
     ylim([size(syllable_fft,1)/125000*25000/2 size(syllable_fft,1)/2]);
     %ylim([size(syllable_fft,1)/100000*30000/2 size(syllable_fft,1)/2]);
     %ylim([0 250]);
     
-    syll_window = 0;
+%{ 
+syll_window = 0;
     
     if syllable_duration  < 64
         syll_window = 64 - 5;
@@ -1308,9 +1294,10 @@ function show_syllables(handles,syllable_ndx)
         syll_window = 512 - 5;
             
     end
-    %syll_window
+    syll_window
     
     xlim([syllable_patch_window_start-5 syllable_patch_window_start+syll_window]);%size of 64 x-axis length
+%}
     
     img = getframe(gca);
     [usv map_usv] = frame2im(img);
