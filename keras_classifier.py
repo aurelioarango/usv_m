@@ -8,8 +8,8 @@ from keras import backend as K
 # dimensions of our images.
 img_width, img_height = 512, 512
 
-train_data_dir = '/home/lio/Documents/Training'
-validation_data_dir = '/home/lio/Documents/Validation'
+train_data_dir = '/home/arang008/thesis_workspace/images/data/Training'
+validation_data_dir = '/home/arang008/thesis_workspace/images/data/Validation'
 nb_train_samples = 780
 nb_validation_samples = 200
 
@@ -17,9 +17,9 @@ epochs = 50
 batch_size = 5
 
 if K.image_data_format() == 'channels_first':
-    input_shape = (3, img_width, img_height)
+    input_shape = (1, img_width, img_height)
 else:
-    input_shape = (img_width, img_height, 3)
+    input_shape = (img_width, img_height, 1)
 
 model = Sequential()
 model.add(Conv2D(32, (3, 3), input_shape=input_shape))
@@ -58,12 +58,14 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
+    color_mode='grayscale',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='binary')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
+    color_mode='grayscale',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='binary')
@@ -75,4 +77,4 @@ model.fit_generator(
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size)
 
-model.save_weights('first_try.h5')
+model.save_weights('second_try.h5')
