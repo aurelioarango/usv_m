@@ -86,7 +86,7 @@ def create_model(train_generator, validation_generator):
     model.add(Activation({{choice(['relu', 'sigmoid'])}}))
 
     model.compile(loss={{choice(['categorical_crossentropy', 'binary_crossentropy','mean_squared_error'])}},
-                  optimizer={{choice(['adam', 'rsmprop', 'sgd'])}},
+                  optimizer={{choice(['adam', 'rmsprop', 'sgd'])}},
                   metrics=['accuracy'])
 
     model.fit_generator(
