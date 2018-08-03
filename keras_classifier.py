@@ -1,3 +1,5 @@
+"""ADD black and white image, sample at 128x128, kernel size"""
+
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
@@ -6,10 +8,10 @@ from keras import backend as K
 
 
 # dimensions of our images.
-img_width, img_height = 512, 512
+img_width, img_height = 128, 128
 
-train_data_dir = '/home/arang008/thesis_workspace/images/data/Training'
-validation_data_dir = '/home/arang008/thesis_workspace/images/data/Validation'
+train_data_dir = '/data/arango/thesis_workspace/data/Training'
+validation_data_dir = '/data/arango/thesis_workspace/data/Validation'
 nb_train_samples = 780
 nb_validation_samples = 200
 
@@ -42,12 +44,12 @@ model.add(Dense(1))
 model.add(Activation('sigmoid'))
 
 model.compile(loss='binary_crossentropy',
-              optimizer='rmsprop',
+              optimizer='adam',
               metrics=['accuracy'])
 
 # this is the augmentation configuration we will use for training
 train_datagen = ImageDataGenerator(
-    rescale=1. / 255,
+    rescale=.25,
     shear_range=0.2,
     zoom_range=0.2,
     horizontal_flip=True)
@@ -58,14 +60,14 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
-    color_mode='grayscale',
+
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='binary')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
-    color_mode='grayscale',
+
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='binary')
@@ -77,4 +79,4 @@ model.fit_generator(
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size)
 
-model.save_weights('second_try.h5')
+model.save_weights('first_try.h5')
