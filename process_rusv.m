@@ -76,7 +76,8 @@ for j=1:numel(wave_files)
     handles.image_dir = fullfile(images_dir, sub_dir);
     
     for i=1:(handles.num_elements)
-        show_syllables(handles,i);
+		write_syllables(handles,i);
+        %show_syllables(handles,i);
     end
 end
 %%}
@@ -976,6 +977,41 @@ function [syllable_data, syllable_stats, filestats, fs] = syllable_activity_file
         filestats.syllable_count_per_second = syllable_split_per_second';
 
     end
+
+end
+
+function write_syllables(handles, syllable_ndx)
+
+    syllable_gt = handles.syllable_data{2, syllable_ndx};
+    syllable_duration = size(syllable_gt, 2);
+    syllable_patch_window=max(handles.patch_window, syllable_duration);
+    syllable_patch_window_start=floor(syllable_patch_window/2)-floor(syllable_duration/2);
+
+
+    syllable_fft = handles.syllable_data{3,syllable_ndx};
+    syllable_patch_fft = zeros(size(syllable_fft,1), syllable_patch_window);
+    syllable_patch_fft(:, syllable_patch_window_start+1:syllable_patch_window_start+syllable_duration) = syllable_fft;
+    syllable_patch_fft_dB=10*log10(abs(syllable_patch_fft(1:end,:)+1e-5)); %
+   
+
+    syllable_patch_fft_dB = syllable_patch_fft_dB(101:400, :);
+    %[M, I] = max(max(syllable_fft_dB, [], 2)); % find the row of maximum signal
+    %syllable_fft_dB = syllable_fft_dB(max(1, I-100):min(size(syllable_fft, 1), I+100), :);
+   
+
+    syllable_patch_fft_dB = flipud(syllable_patch_fft_dB);
+    syllable_patch_fft_dB = resizem(syllable_patch_fft_dB, [handles.patch_window, handles.patch_window], 'bilinear');
+   
+
+    [pathstr, name, ext] = fileparts(handles.filename);
+    img_filename = sprintf('%s_%d.png', name, syllable_ndx);
+
+
+    colormap gray;
+   
+
+    filename = fullfile(handles.image_dir,img_filename );
+    imwrite(rescale(syllable_patch_fft_dB), filename)
 
 end
 

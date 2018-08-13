@@ -15,8 +15,8 @@ def data():
     img_width, img_height = 128, 128
 
     batch_size = 5
-    train_data_dir = '/data/arango/thesis_workspace/data/Training'
-    validation_data_dir = '/data/arango/thesis_workspace/data/Validation'
+    train_data_dir = '/home/lio/Documents/Training' #'/data/arango/thesis_workspace/data/Training'
+    validation_data_dir = '/home/lio/Documents/Validation' #'/data/arango/thesis_workspace/data/Validation'
 
 
 
@@ -83,7 +83,7 @@ def create_model(train_generator, validation_generator):
     model.add(Activation('relu'))
     model.add(Dropout({{uniform(0, 0.5)}}))
     model.add(Dense(1))
-    model.add(Activation({{choice(['relu', 'sigmoid'])}}))
+    model.add(Activation({{choice([ 'sigmoid'])}}))
 
     model.compile(loss={{choice(['categorical_crossentropy', 'binary_crossentropy','mean_squared_error'])}},
                   optimizer={{choice(['adam', 'rmsprop', 'sgd'])}},
