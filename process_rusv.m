@@ -400,9 +400,9 @@ end
 
 % compute MUSV features
 %fmin=35000;
-fmin=18000;
-fmax=110000;
-%fmax=90000;
+fmin=10000;
+%fmax=110000;
+fmax=100000;
 Nmin=floor(Nfft/(fs/2)*fmin);
 Nmax=floor(Nfft/(fs/2)*fmax);
 [gt_sonogram, sonogram, E_low, E_usv, T]=FE_GT_spectra(audio_segment, fs, frame_win, frame_shift, Nfft, Nmin, Nmax);
@@ -544,7 +544,7 @@ function [lp,Xf,E_low, E_usv,T]=FE_GT_spectra(sam,fs,FrameLen,FrameShift,Nfft,Nm
     % T=length(sam);
 
     % Low pass removal
-    fmin=18000;
+    fmin=10000;
     fmax=0.99*fs/2;
     [b,a] = cheby1(8,  0.5, [fmin fmax]/(fs/2));
     sam=filter(b, a, [0 reshape(sam,1,length(sam))]);
@@ -999,7 +999,7 @@ function write_syllables(handles, syllable_ndx)
     %syllable_fft_dB = syllable_fft_dB(max(1, I-100):min(size(syllable_fft, 1), I+100), :);
    
 
-    syllable_patch_fft_dB = flipud(syllable_patch_fft_dB);
+    syllable_patch_fft_dB = rescale(flipud(syllable_patch_fft_dB));
     syllable_patch_fft_dB = resizem(syllable_patch_fft_dB, [handles.patch_window, handles.patch_window], 'bilinear');
    
 
@@ -1011,7 +1011,7 @@ function write_syllables(handles, syllable_ndx)
    
 
     filename = fullfile(handles.image_dir,img_filename );
-    imwrite(rescale(syllable_patch_fft_dB), filename)
+    imwrite(syllable_patch_fft_dB, filename);
 
 end
 

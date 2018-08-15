@@ -1,0 +1,6 @@
+noise-reduction,0.0
+minimum-syllable-duration,8.0
+maximum-syllable-duration,200.0
+minimum-syllable-total-energy,-95.0
+minimum-syllable-peak-amplitude,-50.0
+minimum-syllable-distance,5.0
