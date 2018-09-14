@@ -1,6 +1,11 @@
-# Ignore Files
+# IgnoreFiles
+
 *.h5
+
 *.txt
+
 *.TXT
+
 *.csv
+
 *.CSV
