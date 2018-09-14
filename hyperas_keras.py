@@ -31,9 +31,9 @@ def data():
     img_width, img_height = 128, 128
 
     batch_size = 5
-    train_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\Training'
-    validation_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\Validation'
-    test_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\Test'
+    train_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\archive\\old_data_93_94\\Training'
+    validation_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\archive\\old_data_93_94\\Validation'
+    test_data_dir = 'C:\\Users\\keith-la\\USV_Project\\matlab\\sorted_\\archive\\old_data_93_94\\Test'
 
 
     # this is the augmentation configuration we will use for training
@@ -62,7 +62,7 @@ def data():
 
     validation_generator = validation_datagen.flow_from_directory(
         validation_data_dir,
-        shuffle=True,
+        shuffle=False,
         color_mode='grayscale',
         target_size=(img_width, img_height),
         batch_size=batch_size,
@@ -71,7 +71,7 @@ def data():
 
     test_generator = test_datagen.flow_from_directory(
         test_data_dir,
-        shuffle=True,
+        shuffle=False,
         color_mode='grayscale',
         target_size=(img_width, img_height),
         batch_size=batch_size,
@@ -86,8 +86,8 @@ def create_model(train_generator, validation_generator):
     """ """
     img_width, img_height = 128, 128
     epochs = {{choice(range(75,150))}}
-    nb_train_samples = 600
-    nb_validation_samples = 140
+    nb_train_samples = 480
+    nb_validation_samples = 120
     batch_size = 5
 
 
@@ -125,10 +125,10 @@ def create_model(train_generator, validation_generator):
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, baseline=94.5)
     """
      validation_data: The model will not be trained on this data
+     callbacks=[early_stopping],
     """
     model.fit_generator(
         train_generator,
-        callbacks=[early_stopping],
         steps_per_epoch=nb_train_samples // batch_size,
         epochs=epochs,
         shuffle=True,
@@ -154,6 +154,7 @@ if __name__ == '__main__':
                                           eval_space=True,
                                           return_space=True)
 
+    test_generator.reset()
     print('Saving Best Model')
     best_model.save('best_run_four_class_es_trial.h5')
     print("Best performing model:")
