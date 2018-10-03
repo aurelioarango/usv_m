@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     print_predictions(test_generator, cnn_model, 'cnn_model_results')
     print_predictions(test_generator, server_model, 'server_model_results')
-    print_predictions(test_generator, server_model_2, 'server_model_results')
+    print_predictions(test_generator, server_model_2, 'server2_model_results')
 
 
 
