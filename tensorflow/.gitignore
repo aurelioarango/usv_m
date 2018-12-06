@@ -1,0 +1,22 @@
+# Ignore Files
+
+*.h5
+
+*.txt
+
+*.TXT
+
+*.csv
+
+*.CSV
+
+*.H5
+
+#Ignore Expecific Model Files
+best_run_four_class.h5
+best_run_four_class_es.h5
+best_run_four_class_es_trial.h5
+best_run_four_class_es_trial_95_14.h5
+
+# Ignore Model folder
+models/
