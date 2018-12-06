@@ -117,7 +117,7 @@ def create_model(train_generator, validation_generator):
     model.add(Dropout({{uniform(0, 0.5)}}))
     model.add(Dense(4, activation='softmax'))
 
-    model.compile(loss= {{choice(['categorical_crossentropy','mean_squared_error'])}}, 
+    model.compile(loss = 'categorical_crossentropy',
                   optimizer={{choice(['adam','sgd', 'rmsprop'])}},
                   metrics=['accuracy'])
 
